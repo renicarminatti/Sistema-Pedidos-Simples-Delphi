@@ -1,0 +1,127 @@
+-- MySQL dump 10.13  Distrib 8.0.29, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: db
+-- ------------------------------------------------------
+-- Server version	5.7.38-log
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `clientes`
+--
+
+DROP TABLE IF EXISTS `clientes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `clientes` (
+  `CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `NOME` varchar(100) NOT NULL,
+  `CIDADE` varchar(50) DEFAULT NULL,
+  `UF` char(2) DEFAULT NULL,
+  PRIMARY KEY (`CODIGO`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `clientes`
+--
+
+LOCK TABLES `clientes` WRITE;
+/*!40000 ALTER TABLE `clientes` DISABLE KEYS */;
+INSERT INTO `clientes` VALUES (1,'CONSUMIDOR PADRÃO','RIO BRANCO ','AC'),(2,'JOÃO','MACEIÓ','AL'),(3,'JOANA','MACAPÁ','AP'),(4,'LUCAS','MANAUS','AM'),(5,'ANTONIO','SALVADOR','BA'),(6,'FERNANDO','FORTALEZA','CE'),(7,'BRUNO','BRASÍLIA','DF'),(8,'ALAN','VITÓRIA','ES'),(9,'JOSÉ','GOIÂNIA','GO'),(10,'ALESSANDRO','SÃO LUIS','MA'),(11,'MARIANA','CUIABÁ','MT'),(12,'ANA','CAMPO GRANDE','MS'),(13,'ALEXANDRE','BELO HORIZONTE','BH'),(14,'FELIPE','BELÉM','PA'),(15,'MARCIA','PARAÍBA','PB'),(16,'RENAN','PARANA','PR'),(17,'MARCOS','RECIFE','PE'),(18,'JAIR','RERESINA','PI'),(19,'MATIAS','RIO DE JANEIRO','RJ'),(20,'ANDRE','NATAL','RN'),(21,'ALEX','PORTO ALEGRE','RS');
+/*!40000 ALTER TABLE `clientes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `itens`
+--
+
+DROP TABLE IF EXISTS `itens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `itens` (
+  `NUMEROITEM` int(11) NOT NULL AUTO_INCREMENT,
+  `NUMEROPEDIDO` int(11) NOT NULL,
+  `CODIGOPRODUTO` int(11) NOT NULL,
+  `QUANTIDADE` decimal(15,2) DEFAULT '1.00',
+  `VALORUNITARIO` decimal(15,2) DEFAULT '0.00',
+  `VALORTOTALITEM` decimal(15,2) DEFAULT '0.00',
+  PRIMARY KEY (`NUMEROITEM`),
+  KEY `NUMEROPEDIDO` (`NUMEROPEDIDO`),
+  KEY `CODIGOPRODUTO` (`CODIGOPRODUTO`),
+  CONSTRAINT `itens_ibfk_1` FOREIGN KEY (`NUMEROPEDIDO`) REFERENCES `pedidos` (`NUMERO`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `itens_ibfk_2` FOREIGN KEY (`CODIGOPRODUTO`) REFERENCES `produtos` (`CODIGO`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `pedidos`
+--
+
+DROP TABLE IF EXISTS `pedidos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `pedidos` (
+  `NUMERO` int(11) NOT NULL AUTO_INCREMENT,
+  `DATAEMISSAO` datetime DEFAULT CURRENT_TIMESTAMP,
+  `CODIGOCLIENTE` int(11) DEFAULT NULL,
+  `VALORTOTAL` decimal(15,2) DEFAULT '0.00',
+  PRIMARY KEY (`NUMERO`),
+  KEY `CODIGOCLIENTE` (`CODIGOCLIENTE`),
+  CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`CODIGOCLIENTE`) REFERENCES `clientes` (`CODIGO`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Table structure for table `produtos`
+--
+
+DROP TABLE IF EXISTS `produtos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `produtos` (
+  `CODIGO` int(11) NOT NULL AUTO_INCREMENT,
+  `DESCRICAO` varchar(60) NOT NULL,
+  `PRECOVENDA` decimal(15,2) DEFAULT '0.00',
+  PRIMARY KEY (`CODIGO`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `produtos`
+--
+
+LOCK TABLES `produtos` WRITE;
+/*!40000 ALTER TABLE `produtos` DISABLE KEYS */;
+INSERT INTO `produtos` VALUES (1,'PRODUTO 01',5.00),(2,'PRODUTO 02',7.25),(3,'PRODUTO 03',12.50),(4,'PRODUTO 04',3.25),(5,'PRODUTO 05',4.00),(6,'PRODUTO 06',5.99),(7,'PRODUTO 07',6.99),(8,'PRODUTO 08',15.40),(9,'PRODUTO 09',14.90),(10,'PRODUTO 10',20.00),(11,'PRODUTO 11',14.30),(12,'PRODUTO 12',8.50),(13,'PRODUTO 13',9.75),(14,'PRODUTO 14',12.50),(15,'PRODUTO 15',13.70),(16,'PRODUTO 16',25.00),(17,'PRODUTO 17',30.90),(18,'PRODUTO 18',125.00),(19,'PRODUTO 19',19.80),(20,'PRODUTO 20',17.40),(21,'PRODUTO 21',99.90),(22,'PRODUTO 22',100.50);
+/*!40000 ALTER TABLE `produtos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Dumping events for database 'db'
+--
+
+--
+-- Dumping routines for database 'db'
+--
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2022-09-29  9:25:51

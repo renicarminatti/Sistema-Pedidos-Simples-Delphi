@@ -1,0 +1,21 @@
+object DM: TDM
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 320
+  Width = 660
+  object FDPhysMySQLDriverLink1: TFDPhysMySQLDriverLink
+    VendorLib = '.\Bin\libmysql.dll'
+    Left = 160
+    Top = 24
+  end
+  object conMySQL: TFDConnection
+    Params.Strings = (
+      'Database=db'
+      'User_Name=pedidos'
+      'Password=pedidos'
+      'DriverID=MySQL')
+    LoginPrompt = False
+    Left = 48
+    Top = 24
+  end
+end

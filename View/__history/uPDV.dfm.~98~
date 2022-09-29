@@ -1,0 +1,826 @@
+object fPDV: TfPDV
+  Left = 0
+  Top = 0
+  Caption = 'PDV  -  [ CAIXA LIVRE ]'
+  ClientHeight = 598
+  ClientWidth = 906
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  OnShow = FormShow
+  PixelsPerInch = 96
+  TextHeight = 13
+  object pnlButtons: TPanel
+    Left = 766
+    Top = 0
+    Width = 140
+    Height = 579
+    Align = alRight
+    BevelOuter = bvNone
+    TabOrder = 0
+    ExplicitHeight = 598
+    object pnlBtnGravar: TPanel
+      AlignWithMargins = True
+      Left = 3
+      Top = 51
+      Width = 134
+      Height = 37
+      Align = alTop
+      BevelOuter = bvNone
+      Color = 8448823
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 0
+      object btnGravarPedido: TSpeedButton
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 128
+        Height = 31
+        Align = alClient
+        Caption = ' Gravar'
+        Enabled = False
+        Flat = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -15
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        OnClick = btnGravarPedidoClick
+        ExplicitLeft = 1
+        ExplicitTop = 0
+        ExplicitWidth = 177
+        ExplicitHeight = 37
+      end
+    end
+    object pnlNovoPedido: TPanel
+      AlignWithMargins = True
+      Left = 3
+      Top = 8
+      Width = 134
+      Height = 37
+      Margins.Top = 8
+      Align = alTop
+      BevelOuter = bvNone
+      Color = 15449396
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 1
+      object btnNovoPedido: TSpeedButton
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 128
+        Height = 31
+        Align = alClient
+        Caption = ' Novo'
+        Flat = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -15
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        OnClick = btnNovoPedidoClick
+        ExplicitLeft = 96
+        ExplicitTop = 8
+        ExplicitWidth = 23
+        ExplicitHeight = 22
+      end
+    end
+    object pnlCancelarPedido: TPanel
+      AlignWithMargins = True
+      Left = 3
+      Top = 94
+      Width = 134
+      Height = 37
+      Align = alTop
+      BevelOuter = bvNone
+      Color = 5584362
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 2
+      object btnCancelarPedido: TSpeedButton
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 128
+        Height = 31
+        Align = alClient
+        Caption = ' Cancelar'
+        Enabled = False
+        Flat = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -15
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        OnClick = btnCancelarPedidoClick
+        ExplicitTop = 0
+      end
+    end
+  end
+  object pnlAll: TPanel
+    Left = 0
+    Top = 0
+    Width = 766
+    Height = 579
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 1
+    ExplicitHeight = 598
+    object pnlDown: TPanel
+      Left = 0
+      Top = 535
+      Width = 766
+      Height = 44
+      Align = alBottom
+      BevelOuter = bvNone
+      Color = clHotLight
+      ParentBackground = False
+      TabOrder = 0
+      ExplicitTop = 554
+      object pnlTotalPedito: TPanel
+        Left = 0
+        Top = 0
+        Width = 766
+        Height = 41
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 0
+        object lblTTotal: TLabel
+          AlignWithMargins = True
+          Left = 3
+          Top = 3
+          Width = 202
+          Height = 35
+          Align = alLeft
+          Alignment = taRightJustify
+          Caption = 'Total Pedido: '
+          Color = clBtnFace
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWhite
+          Font.Height = -29
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          ParentColor = False
+          ParentFont = False
+          Layout = tlCenter
+          ExplicitLeft = 15
+        end
+        object pnlTotalPedido: TPanel
+          AlignWithMargins = True
+          Left = 548
+          Top = 3
+          Width = 215
+          Height = 35
+          Align = alRight
+          BevelOuter = bvNone
+          Color = clGray
+          Ctl3D = False
+          ParentBackground = False
+          ParentCtl3D = False
+          TabOrder = 0
+          object lblTotalPedido: TLabel
+            Left = 0
+            Top = 0
+            Width = 215
+            Height = 35
+            Align = alClient
+            Alignment = taCenter
+            Caption = 'R$ 0,00'
+            Color = clBtnFace
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWhite
+            Font.Height = -29
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentColor = False
+            ParentFont = False
+            Layout = tlCenter
+            ExplicitWidth = 111
+          end
+        end
+      end
+    end
+    object pnlPedidoItems: TPanel
+      Left = 0
+      Top = 166
+      Width = 766
+      Height = 369
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 1
+      ExplicitHeight = 388
+      object dbgrdItems: TDBGrid
+        AlignWithMargins = True
+        Left = 3
+        Top = 86
+        Width = 760
+        Height = 280
+        Align = alClient
+        BorderStyle = bsNone
+        DataSource = dsListProdutos
+        Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgConfirmDelete, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+        TabOrder = 0
+        TitleFont.Charset = DEFAULT_CHARSET
+        TitleFont.Color = clWindowText
+        TitleFont.Height = -11
+        TitleFont.Name = 'Tahoma'
+        TitleFont.Style = []
+        OnKeyDown = dbgrdItemsKeyDown
+        OnKeyPress = dbgrdItemsKeyPress
+        Columns = <
+          item
+            Expanded = False
+            FieldName = 'CODIGOPRODUTO'
+            Title.Caption = 'C'#243'd. Produto'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'DESCRICAO'
+            Title.Caption = 'Descri'#231#227'o'
+            Width = 358
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'QUANTIDADE'
+            Title.Caption = 'Quant.'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'VALORUNITARIO'
+            Title.Caption = 'Pre'#231'o Unit.'
+            Visible = True
+          end
+          item
+            Expanded = False
+            FieldName = 'VALORTOTALITEM'
+            Title.Caption = 'Total'
+            Visible = True
+          end>
+      end
+      object pnlPedidoItem: TPanel
+        Left = 0
+        Top = 0
+        Width = 766
+        Height = 83
+        Align = alTop
+        BevelOuter = bvNone
+        ParentBackground = False
+        TabOrder = 1
+        object grpPedidoItem: TGroupBox
+          AlignWithMargins = True
+          Left = 3
+          Top = 3
+          Width = 760
+          Height = 77
+          Align = alClient
+          Caption = ' [ DADOS DO ITEM ] '
+          TabOrder = 0
+          object btnFProduto: TBitBtn
+            Left = 83
+            Top = 42
+            Width = 24
+            Height = 23
+            Enabled = False
+            Glyph.Data = {
+              36040000424D3604000000000000360000002800000010000000100000000100
+              2000000000000004000000000000000000000000000000000000000000000000
+              0000000000000000000000000000000000000000000000000000000000000000
+              0000000000000000000000000000000000000000000000000000000000000000
+              0000000000000000000000000000000000000000000000000000000000000000
+              0000000000000000000000000000000000000000000000000000000000000000
+              0000000000000000000000000000000000000000000000000000000000000000
+              0000000000004A220966AC5116F07B380FAB0000000000000000000000000000
+              0000000000000000000000000000000000000000000000000000000000000000
+              00004D230A69B85617FFBB5617FFAE4F16F30000000000000000000000000000
+              0000000000000000000000000000000000000000000000000000000000004D24
+              0A69BC5819FFBB5718FFB95318FC401D08570000000000000000000000000000
+              000000000000281406368A4315B7B3571AF0B35818F0854012B466300E89BD59
+              19FFBC5919FFBA5719FC401E0857000000000000000000000000000000000000
+              00005A2D0F78C05F1FFFC06021FFCD8250FFCD824FFFBE5D1FFFBE5A1BFFBD5A
+              19FFBB5819FC401E095700000000000000000000000000000000000000003018
+              083FC0601FFCCD804CFFF7EAE2FFFFFFFFFFFFFFFFFFF7EAE2FFCA7A46FFBC5A
+              1BFF622F0D84000000000000000000000000000000000000000000000000944B
+              18C3C36929FFF6E9E0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6E8DFFFC063
+              23FF854012B4000000000000000000000000000000000000000000000000B75D
+              20F0D18958FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFCF84
+              54FFAD541AEA000000000000000000000000000000000000000000000000B85E
+              20F0D18A59FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD085
+              55FFAE541AEA000000000000000000000000000000000000000000000000964D
+              1BC3C5692BFFF7EBE2FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6E8DFFFC164
+              26FF854214B40000000000000000000000000000000000000000000000003019
+              093FC36525FFCF844FFFF7EBE2FFFFFFFFFFFFFFFFFFF7EBE2FFCD804CFFBF5E
+              1FFF361B08480000000000000000000000000000000000000000000000000000
+              00005E31127BC36625FFC46726FFCF8551FFCF8350FFC46523FFC16020FF5D2E
+              0F7B000000000000000000000000000000000000000000000000000000000000
+              0000000000003019093F874518B1AD591EE4AD591EE4864517B13018083F0000
+              0000000000000000000000000000000000000000000000000000000000000000
+              0000000000000000000000000000000000000000000000000000000000000000
+              0000000000000000000000000000000000000000000000000000}
+            Style = bsNew
+            TabOrder = 1
+            TabStop = False
+            OnClick = btnFProdutoClick
+          end
+          object edtItemCod: TLabeledEdit
+            Left = 10
+            Top = 43
+            Width = 71
+            Height = 21
+            BevelInner = bvNone
+            BevelOuter = bvNone
+            EditLabel.Width = 72
+            EditLabel.Height = 13
+            EditLabel.Caption = 'C'#243'd. Produto'
+            EditLabel.Font.Charset = DEFAULT_CHARSET
+            EditLabel.Font.Color = clWindowText
+            EditLabel.Font.Height = -11
+            EditLabel.Font.Name = 'Tahoma'
+            EditLabel.Font.Style = [fsBold]
+            EditLabel.ParentFont = False
+            Enabled = False
+            NumbersOnly = True
+            TabOrder = 0
+            OnKeyPress = edtItemCodKeyPress
+          end
+          object edtItemDescricao: TLabeledEdit
+            Left = 112
+            Top = 43
+            Width = 250
+            Height = 19
+            Ctl3D = False
+            EditLabel.Width = 55
+            EditLabel.Height = 13
+            EditLabel.Caption = 'Descri'#231#227'o'
+            EditLabel.Font.Charset = DEFAULT_CHARSET
+            EditLabel.Font.Color = clWindowText
+            EditLabel.Font.Height = -11
+            EditLabel.Font.Name = 'Tahoma'
+            EditLabel.Font.Style = [fsBold]
+            EditLabel.ParentFont = False
+            Enabled = False
+            ParentCtl3D = False
+            ReadOnly = True
+            TabOrder = 2
+          end
+          object edtItemPreco: TLabeledEdit
+            Left = 503
+            Top = 43
+            Width = 127
+            Height = 19
+            Ctl3D = False
+            EditLabel.Width = 32
+            EditLabel.Height = 13
+            EditLabel.Caption = 'Pre'#231'o'
+            EditLabel.Font.Charset = DEFAULT_CHARSET
+            EditLabel.Font.Color = clWindowText
+            EditLabel.Font.Height = -11
+            EditLabel.Font.Name = 'Tahoma'
+            EditLabel.Font.Style = [fsBold]
+            EditLabel.ParentFont = False
+            Enabled = False
+            ParentCtl3D = False
+            TabOrder = 4
+            OnKeyPress = edtItemPrecoKeyPress
+          end
+          object edtItemQuantidade: TLabeledEdit
+            Left = 368
+            Top = 43
+            Width = 127
+            Height = 19
+            Ctl3D = False
+            EditLabel.Width = 65
+            EditLabel.Height = 13
+            EditLabel.Caption = 'Quantidade'
+            EditLabel.Font.Charset = DEFAULT_CHARSET
+            EditLabel.Font.Color = clWindowText
+            EditLabel.Font.Height = -11
+            EditLabel.Font.Name = 'Tahoma'
+            EditLabel.Font.Style = [fsBold]
+            EditLabel.ParentFont = False
+            Enabled = False
+            ParentCtl3D = False
+            TabOrder = 3
+            OnKeyPress = edtItemQuantidadeKeyPress
+          end
+          object pnlBtnAddItem: TPanel
+            AlignWithMargins = True
+            Left = 637
+            Top = 40
+            Width = 105
+            Height = 25
+            BevelOuter = bvNone
+            Color = 8448823
+            Ctl3D = False
+            ParentBackground = False
+            ParentCtl3D = False
+            TabOrder = 5
+            object btnAddItem: TSpeedButton
+              Left = 0
+              Top = 0
+              Width = 105
+              Height = 25
+              Align = alClient
+              Caption = 'Adicionar'
+              Enabled = False
+              Flat = True
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -12
+              Font.Name = 'Tahoma'
+              Font.Style = []
+              ParentFont = False
+              OnClick = btnAddItemClick
+              ExplicitWidth = 97
+            end
+          end
+        end
+      end
+    end
+    object pnlTop: TPanel
+      Left = 0
+      Top = 83
+      Width = 766
+      Height = 83
+      Align = alTop
+      BevelOuter = bvNone
+      ParentBackground = False
+      TabOrder = 2
+      object grpCLiente: TGroupBox
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 760
+        Height = 77
+        Align = alClient
+        Caption = ' [ DADOS DO CLIENTE ] '
+        TabOrder = 0
+        object btnFCliente: TBitBtn
+          Left = 83
+          Top = 39
+          Width = 24
+          Height = 23
+          Glyph.Data = {
+            36040000424D3604000000000000360000002800000010000000100000000100
+            2000000000000004000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000004A220966AC5116F07B380FAB0000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            00004D230A69B85617FFBB5617FFAE4F16F30000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000004D24
+            0A69BC5819FFBB5718FFB95318FC401D08570000000000000000000000000000
+            000000000000281406368A4315B7B3571AF0B35818F0854012B466300E89BD59
+            19FFBC5919FFBA5719FC401E0857000000000000000000000000000000000000
+            00005A2D0F78C05F1FFFC06021FFCD8250FFCD824FFFBE5D1FFFBE5A1BFFBD5A
+            19FFBB5819FC401E095700000000000000000000000000000000000000003018
+            083FC0601FFCCD804CFFF7EAE2FFFFFFFFFFFFFFFFFFF7EAE2FFCA7A46FFBC5A
+            1BFF622F0D84000000000000000000000000000000000000000000000000944B
+            18C3C36929FFF6E9E0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6E8DFFFC063
+            23FF854012B4000000000000000000000000000000000000000000000000B75D
+            20F0D18958FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFCF84
+            54FFAD541AEA000000000000000000000000000000000000000000000000B85E
+            20F0D18A59FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD085
+            55FFAE541AEA000000000000000000000000000000000000000000000000964D
+            1BC3C5692BFFF7EBE2FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6E8DFFFC164
+            26FF854214B40000000000000000000000000000000000000000000000003019
+            093FC36525FFCF844FFFF7EBE2FFFFFFFFFFFFFFFFFFF7EBE2FFCD804CFFBF5E
+            1FFF361B08480000000000000000000000000000000000000000000000000000
+            00005E31127BC36625FFC46726FFCF8551FFCF8350FFC46523FFC16020FF5D2E
+            0F7B000000000000000000000000000000000000000000000000000000000000
+            0000000000003019093F874518B1AD591EE4AD591EE4864517B13018083F0000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000}
+          Style = bsNew
+          TabOrder = 1
+          TabStop = False
+          OnClick = btnFClienteClick
+        end
+        object edtClienteCidade: TLabeledEdit
+          Left = 368
+          Top = 41
+          Width = 262
+          Height = 19
+          Ctl3D = False
+          EditLabel.Width = 38
+          EditLabel.Height = 13
+          EditLabel.Caption = 'Cidade'
+          EditLabel.Font.Charset = DEFAULT_CHARSET
+          EditLabel.Font.Color = clWindowText
+          EditLabel.Font.Height = -11
+          EditLabel.Font.Name = 'Tahoma'
+          EditLabel.Font.Style = [fsBold]
+          EditLabel.ParentFont = False
+          ParentCtl3D = False
+          ReadOnly = True
+          TabOrder = 3
+        end
+        object edtClienteCod: TLabeledEdit
+          Left = 10
+          Top = 41
+          Width = 71
+          Height = 19
+          Ctl3D = False
+          EditLabel.Width = 66
+          EditLabel.Height = 13
+          EditLabel.Caption = 'C'#243'd. Cliente'
+          EditLabel.Font.Charset = DEFAULT_CHARSET
+          EditLabel.Font.Color = clWindowText
+          EditLabel.Font.Height = -11
+          EditLabel.Font.Name = 'Tahoma'
+          EditLabel.Font.Style = [fsBold]
+          EditLabel.ParentFont = False
+          NumbersOnly = True
+          ParentCtl3D = False
+          TabOrder = 0
+          OnChange = edtClienteCodChange
+          OnKeyPress = edtClienteCodKeyPress
+        end
+        object edtClienteNome: TLabeledEdit
+          Left = 112
+          Top = 41
+          Width = 250
+          Height = 19
+          Ctl3D = False
+          EditLabel.Width = 39
+          EditLabel.Height = 13
+          EditLabel.Caption = 'Cliente'
+          EditLabel.Font.Charset = DEFAULT_CHARSET
+          EditLabel.Font.Color = clWindowText
+          EditLabel.Font.Height = -11
+          EditLabel.Font.Name = 'Tahoma'
+          EditLabel.Font.Style = [fsBold]
+          EditLabel.ParentFont = False
+          ParentCtl3D = False
+          ReadOnly = True
+          TabOrder = 2
+        end
+        object edtClienteUF: TLabeledEdit
+          Left = 637
+          Top = 41
+          Width = 105
+          Height = 19
+          Ctl3D = False
+          EditLabel.Width = 14
+          EditLabel.Height = 13
+          EditLabel.Caption = 'UF'
+          EditLabel.Font.Charset = DEFAULT_CHARSET
+          EditLabel.Font.Color = clWindowText
+          EditLabel.Font.Height = -11
+          EditLabel.Font.Name = 'Tahoma'
+          EditLabel.Font.Style = [fsBold]
+          EditLabel.ParentFont = False
+          ParentCtl3D = False
+          ReadOnly = True
+          TabOrder = 4
+        end
+      end
+    end
+    object pnlDadosPedido: TPanel
+      Left = 0
+      Top = 0
+      Width = 766
+      Height = 83
+      Align = alTop
+      BevelOuter = bvNone
+      TabOrder = 3
+      object grpDadosPedido: TGroupBox
+        AlignWithMargins = True
+        Left = 3
+        Top = 3
+        Width = 760
+        Height = 77
+        Align = alClient
+        Caption = ' [ DADOS DO PEDIDO ]'
+        TabOrder = 0
+        object edtPedidoNumero: TLabeledEdit
+          Left = 10
+          Top = 41
+          Width = 71
+          Height = 19
+          Ctl3D = False
+          EditLabel.Width = 65
+          EditLabel.Height = 13
+          EditLabel.Caption = 'C'#243'd. Pedido'
+          EditLabel.Font.Charset = DEFAULT_CHARSET
+          EditLabel.Font.Color = clWindowText
+          EditLabel.Font.Height = -11
+          EditLabel.Font.Name = 'Tahoma'
+          EditLabel.Font.Style = [fsBold]
+          EditLabel.ParentFont = False
+          NumbersOnly = True
+          ParentCtl3D = False
+          TabOrder = 0
+        end
+        object btnFPedido: TBitBtn
+          Left = 89
+          Top = 39
+          Width = 122
+          Height = 23
+          Caption = 'Carregar Pedido'
+          Glyph.Data = {
+            36040000424D3604000000000000360000002800000010000000100000000100
+            2000000000000004000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000004A220966AC5116F07B380FAB0000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            00004D230A69B85617FFBB5617FFAE4F16F30000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000004D24
+            0A69BC5819FFBB5718FFB95318FC401D08570000000000000000000000000000
+            000000000000281406368A4315B7B3571AF0B35818F0854012B466300E89BD59
+            19FFBC5919FFBA5719FC401E0857000000000000000000000000000000000000
+            00005A2D0F78C05F1FFFC06021FFCD8250FFCD824FFFBE5D1FFFBE5A1BFFBD5A
+            19FFBB5819FC401E095700000000000000000000000000000000000000003018
+            083FC0601FFCCD804CFFF7EAE2FFFFFFFFFFFFFFFFFFF7EAE2FFCA7A46FFBC5A
+            1BFF622F0D84000000000000000000000000000000000000000000000000944B
+            18C3C36929FFF6E9E0FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6E8DFFFC063
+            23FF854012B4000000000000000000000000000000000000000000000000B75D
+            20F0D18958FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFCF84
+            54FFAD541AEA000000000000000000000000000000000000000000000000B85E
+            20F0D18A59FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD085
+            55FFAE541AEA000000000000000000000000000000000000000000000000964D
+            1BC3C5692BFFF7EBE2FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF6E8DFFFC164
+            26FF854214B40000000000000000000000000000000000000000000000003019
+            093FC36525FFCF844FFFF7EBE2FFFFFFFFFFFFFFFFFFF7EBE2FFCD804CFFBF5E
+            1FFF361B08480000000000000000000000000000000000000000000000000000
+            00005E31127BC36625FFC46726FFCF8551FFCF8350FFC46523FFC16020FF5D2E
+            0F7B000000000000000000000000000000000000000000000000000000000000
+            0000000000003019093F874518B1AD591EE4AD591EE4864517B13018083F0000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000}
+          Style = bsNew
+          TabOrder = 1
+          TabStop = False
+          OnClick = btnFPedidoClick
+        end
+        object btnCPedido: TBitBtn
+          Left = 223
+          Top = 39
+          Width = 122
+          Height = 23
+          Caption = 'Cancelar Pedido'
+          Glyph.Data = {
+            36040000424D3604000000000000360000002800000010000000100000000100
+            2000000000000004000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000000000004463
+            D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463
+            D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463
+            D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4463D8FF4463D8FF4261D3F94463D8FF4463D8FF4463D8FF4463
+            D8FF4361D5FB4463D8FF4463D8FF4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4463D8FF3751B0D0090D1D22344CA5C34463D8FF4463D8FF3147
+            9BB70B1023293C57BFE14463D8FF4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4260D0F6080C191E0000000003050B0D344CA5C331479BB70203
+            0607000000000D132A314463D7FE4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4463D8FF31489DB90304080A0000000003050B0D020306070000
+            000004060D0F354DA9C74463D8FF4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4463D8FF4463D8FF31489DB90304080A00000000000000000406
+            0D0F354DA9C74463D8FF4463D8FF4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4463D8FF4463D8FF31479BB70203060700000000000000000305
+            0A0C344CA5C34463D8FF4463D8FF4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4463D8FF31479BB7020306070000000004050C0E0304080A0000
+            000003050A0C344CA5C34463D8FF4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4261D3F9090D1C210000000004060D0F354DA9C731489DB90304
+            080A000000000C11262D4362D6FD4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4463D8FF3A54B7D80B102329354DA9C74463D8FF4463D8FF3148
+            9DB90B11242B3C57BEE04463D8FF4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4463D8FF4463D8FF4361D5FB4463D8FF4463D8FF4463D8FF4463
+            D8FF4361D5FB4463D8FF4463D8FF4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463
+            D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF00000000000000004463
+            D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463
+            D8FF4463D8FF4463D8FF4463D8FF4463D8FF4463D8FF00000000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000000000}
+          Style = bsNew
+          TabOrder = 2
+          TabStop = False
+          OnClick = btnCPedidoClick
+        end
+      end
+    end
+  end
+  object stat1: TStatusBar
+    Left = 0
+    Top = 579
+    Width = 906
+    Height = 19
+    Panels = <
+      item
+        Width = 630
+      end
+      item
+        Text = 'Teste T'#233'cnico Delphi MySQL [Reni Carminatti]'
+        Width = 50
+      end>
+    ExplicitLeft = 464
+    ExplicitTop = 312
+    ExplicitWidth = 0
+  end
+  object qryListProduto: TFDQuery
+    Connection = DM.conMySQL
+    SQL.Strings = (
+      'SELECT'
+      '  i.NUMEROITEM,'
+      '  i.NUMEROPEDIDO,'
+      #10'  i.CODIGOPRODUTO,'
+      #10'  p.DESCRICAO,'
+      #10'  i.QUANTIDADE,'
+      #10'  i.VALORUNITARIO,'
+      #10'  i.VALORTOTALITEM'
+      #10'FROM itens AS i'
+      #10'INNER JOIN produtos AS P'
+      #10'ON (i.CODIGOPRODUTO=P.CODIGO)'
+      #10'where'
+      '  i.NUMEROPEDIDO = :NUMEROPEDIDO'
+      ''
+      ''
+      '')
+    Left = 552
+    Top = 312
+    ParamData = <
+      item
+        Name = 'NUMEROPEDIDO'
+        ParamType = ptInput
+      end>
+    object qryListProdutoNUMEROITEM: TFDAutoIncField
+      FieldName = 'NUMEROITEM'
+      Origin = 'NUMEROITEM'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object qryListProdutoCODIGOPRODUTO: TIntegerField
+      FieldName = 'CODIGOPRODUTO'
+      Origin = 'CODIGOPRODUTO'
+      Required = True
+    end
+    object qryListProdutoDESCRICAO: TStringField
+      AutoGenerateValue = arDefault
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      ProviderFlags = []
+      ReadOnly = True
+      Size = 60
+    end
+    object qryListProdutoQUANTIDADE: TBCDField
+      AutoGenerateValue = arDefault
+      FieldName = 'QUANTIDADE'
+      Origin = 'QUANTIDADE'
+      DisplayFormat = '#,###0.000'
+      Precision = 15
+      Size = 2
+    end
+    object qryListProdutoVALORUNITARIO: TBCDField
+      AutoGenerateValue = arDefault
+      FieldName = 'VALORUNITARIO'
+      Origin = 'VALORUNITARIO'
+      DisplayFormat = 'R$ #,##0.00'
+      Precision = 15
+      Size = 2
+    end
+    object qryListProdutoVALORTOTALITEM: TBCDField
+      AutoGenerateValue = arDefault
+      FieldName = 'VALORTOTALITEM'
+      Origin = 'VALORTOTALITEM'
+      DisplayFormat = 'R$ #,##0.00'
+      Precision = 15
+      Size = 2
+    end
+    object qryListProdutoNUMEROPEDIDO: TIntegerField
+      FieldName = 'NUMEROPEDIDO'
+      Origin = 'NUMEROPEDIDO'
+      Required = True
+    end
+  end
+  object dsListProdutos: TDataSource
+    DataSet = qryListProduto
+    Left = 552
+    Top = 368
+  end
+end

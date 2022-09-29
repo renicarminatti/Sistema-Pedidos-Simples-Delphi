@@ -1,0 +1,558 @@
+unit uPDV;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Grids, Vcl.DBGrids, Vcl.Buttons, Model.Produto, Model.Pedido,
+  Model.Cliente, Model.Item,
+  dxGDIPlusClasses, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+
+type
+  TfPDV = class(TForm)
+    qryListProduto: TFDQuery;
+    dsListProdutos: TDataSource;
+    qryListProdutoCODIGOPRODUTO: TIntegerField;
+    qryListProdutoDESCRICAO: TStringField;
+    qryListProdutoQUANTIDADE: TBCDField;
+    qryListProdutoVALORUNITARIO: TBCDField;
+    qryListProdutoVALORTOTALITEM: TBCDField;
+    qryListProdutoNUMEROITEM: TFDAutoIncField;
+    pnlButtons: TPanel;
+    pnlAll: TPanel;
+    pnlDown: TPanel;
+    pnlTotalPedito: TPanel;
+    lblTTotal: TLabel;
+    pnlTotalPedido: TPanel;
+    lblTotalPedido: TLabel;
+    pnlPedidoItems: TPanel;
+    dbgrdItems: TDBGrid;
+    pnlPedidoItem: TPanel;
+    grpPedidoItem: TGroupBox;
+    btnFProduto: TBitBtn;
+    edtItemCod: TLabeledEdit;
+    edtItemDescricao: TLabeledEdit;
+    edtItemPreco: TLabeledEdit;
+    edtItemQuantidade: TLabeledEdit;
+    pnlTop: TPanel;
+    grpCLiente: TGroupBox;
+    btnFCliente: TBitBtn;
+    edtClienteCidade: TLabeledEdit;
+    edtClienteCod: TLabeledEdit;
+    edtClienteNome: TLabeledEdit;
+    edtClienteUF: TLabeledEdit;
+    pnlBtnGravar: TPanel;
+    btnGravarPedido: TSpeedButton;
+    pnlNovoPedido: TPanel;
+    btnNovoPedido: TSpeedButton;
+    pnlBtnAddItem: TPanel;
+    btnAddItem: TSpeedButton;
+    pnlCancelarPedido: TPanel;
+    btnCancelarPedido: TSpeedButton;
+    qryListProdutoNUMEROPEDIDO: TIntegerField;
+    pnlDadosPedido: TPanel;
+    grpDadosPedido: TGroupBox;
+    edtPedidoNumero: TLabeledEdit;
+    btnFPedido: TBitBtn;
+    btnCPedido: TBitBtn;
+    procedure edtItemCodKeyPress(Sender: TObject; var Key: Char);
+    procedure edtItemQuantidadeKeyPress(Sender: TObject; var Key: Char);
+    procedure edtItemPrecoKeyPress(Sender: TObject; var Key: Char);
+    procedure ShowProduto(Produto: TProduto);
+    procedure btnAddItemClick(Sender: TObject);
+    procedure btnFProdutoClick(Sender: TObject);
+    procedure btnFClienteClick(Sender: TObject);
+    procedure edtClienteCodKeyPress(Sender: TObject; var Key: Char);
+    procedure btnNovoPedidoClick(Sender: TObject);
+    procedure dbgrdItemsKeyPress(Sender: TObject; var Key: Char);
+    procedure dbgrdItemsKeyDown(Sender: TObject; var Key: Word;
+      Shift: TShiftState);
+    procedure btnGravarPedidoClick(Sender: TObject);
+    procedure btnCancelarPedidoClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure edtClienteCodChange(Sender: TObject);
+    procedure btnCPedidoClick(Sender: TObject);
+    procedure btnFPedidoClick(Sender: TObject);
+    procedure btnEditarPedidoClick(Sender: TObject);
+  private
+    procedure LocalizaProduto;
+    procedure ShowCliente(Cliente: TCliente);
+    procedure LocalizaCliente(codigoCliente: Integer);
+    procedure LimpaCamposItem;
+    procedure SetEditar;
+    procedure SetInsert;
+    procedure LimpaDadosPedido;
+  public
+    { Public declarations }
+  var
+    numeroDoPedido: Integer;
+  end;
+
+var
+  fPDV: TfPDV;
+
+implementation
+
+uses
+  Controller.Produtos, uDM, Controller.Pedidos, Controller.Clientes,
+  Controller.Item;
+
+{$R *.dfm}
+
+procedure TfPDV.btnAddItemClick(Sender: TObject);
+var
+  Item: Titem;
+  ControllerItem: TControllerItens;
+  TotalPedido: Double;
+begin
+  Item := Titem.Create;
+  ControllerItem := TControllerItens.Create;
+  try
+    try
+      if StrToIntDef(edtClienteCod.Text, 0) = 0 then
+      begin
+        MessageDlg('Selecione um Cliente...', mtInformation, [mbOk], 0);
+        edtClienteCod.SetFocus;
+      end
+      else
+      begin
+        with Item do
+        begin
+          NumeroPedido := numeroDoPedido;
+          { VALIDAÇÕES DE COMPOS FEITAS NO VIEW PARA EVITAR CONSUMO EM CASO DE USO DE API }
+          try
+            CodigoProduto := StrToInt(edtItemCod.Text);
+          except
+            edtItemCod.SetFocus;
+            raise Exception.Create('Cód. do produto é inválido.');
+          end;
+          try
+            Quantidade := StrToFloat(edtItemQuantidade.Text);
+          except
+            edtItemQuantidade.SetFocus;
+            raise Exception.Create('Quantidade é inválido.');
+          end;
+          try
+            ValorUnitario := StrToFloat(edtItemPreco.Text);
+          except
+            edtItemPreco.SetFocus;
+            raise Exception.Create('Preço unitário é inválido.');
+          end;
+          ValorTotalItem := Quantidade * ValorUnitario;
+        end;
+        if btnAddItem.Caption = 'Adicionar' then
+        begin
+          TotalPedido := ControllerItem.InserirItem(Item);
+          SetInsert;
+        end;
+        if btnAddItem.Caption = 'Alterar' then
+        begin
+          Item.Numero := qryListProdutoNUMEROITEM.AsInteger;
+          TotalPedido := ControllerItem.Alterar(Item);
+          SetInsert;
+        end;
+        qryListProduto.Refresh;
+        lblTotalPedido.Caption := FormatFloat('R$ #,##0.00', TotalPedido);
+        LimpaCamposItem;
+      end;
+    except
+      on E: Exception do
+      begin
+        raise Exception.Create(E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(Item);
+    FreeAndNil(ControllerItem);
+  end;
+end;
+
+procedure TfPDV.LocalizaProduto;
+var
+  Produto: TProduto;
+  ControllerProduto: TControllerProduto;
+begin
+  Produto := TProduto.Create;
+  ControllerProduto := TControllerProduto.Create;
+  try
+    try
+      StrToInt(edtItemCod.Text);
+    except
+      MessageDlg('Cód. do produto inválido!', mtInformation, [mbOk], 0);
+      edtItemCod.Color := $00B9B9FF;
+      edtItemCod.SetFocus;
+      Abort;
+    end;
+    ControllerProduto.CarregarProduto(StrToInt(edtItemCod.Text), Produto);
+    ShowProduto(Produto);
+  finally
+    FreeAndNil(Produto);
+    FreeAndNil(ControllerProduto);
+  end;
+end;
+
+procedure TfPDV.ShowCliente(Cliente: TCliente);
+var
+  ControllerPedido: TControllerPedidos;
+begin
+
+  if Cliente.Codigo = 0 then
+  begin
+    MessageDlg('Cliente não encontrado!', mtInformation, [mbOk], 0);
+    edtClienteCod.Clear;
+    edtClienteCod.SetFocus;
+  end
+  else
+  begin
+    edtClienteCod.Text := Cliente.Codigo.ToString;
+    edtClienteNome.Text := Cliente.Nome;
+    edtClienteCidade.Text := Cliente.Cidade;
+    edtClienteUF.Text := Cliente.UF;
+    edtClienteCod.Color := clWindow;
+    ControllerPedido := TControllerPedidos.Create;
+    try
+      ControllerPedido.AlteraCliente(Cliente.Codigo, numeroDoPedido);
+    finally
+      FreeAndNil(ControllerPedido);
+    end;
+    SetInsert;
+  end;
+end;
+
+procedure TfPDV.LocalizaCliente(codigoCliente: Integer);
+var
+  Cliente: TCliente;
+  ControllerCliente: TControllerClientes;
+begin
+  Cliente := TCliente.Create;
+
+  ControllerCliente := TControllerClientes.Create;
+  try
+    ControllerCliente.CarregaCliente(codigoCliente, Cliente);
+    ShowCliente(Cliente);
+  finally
+    FreeAndNil(Cliente);
+    FreeAndNil(ControllerCliente);
+  end;
+end;
+
+procedure TfPDV.LimpaCamposItem;
+begin
+  edtItemCod.Clear;
+  edtItemDescricao.Clear;
+  edtItemQuantidade.Clear;
+  edtItemPreco.Clear;
+  edtItemCod.SetFocus;
+end;
+
+procedure TfPDV.SetEditar;
+begin
+  edtItemCod.Text := qryListProdutoCODIGOPRODUTO.AsString;
+  edtItemDescricao.Text := qryListProdutoDESCRICAO.AsString;
+  edtItemQuantidade.Text := qryListProdutoQUANTIDADE.AsString;
+  edtItemPreco.Text := qryListProdutoVALORUNITARIO.AsString;
+  edtItemCod.Enabled := False;
+  edtItemDescricao.Enabled := False;
+  dbgrdItems.Enabled := False;
+  btnAddItem.Caption := 'Alterar';
+  edtItemQuantidade.SetFocus;
+end;
+
+procedure TfPDV.SetInsert;
+begin
+  edtItemCod.Enabled := True;
+  edtItemDescricao.Enabled := True;
+  edtItemQuantidade.Enabled := True;
+  edtItemPreco.Enabled := True;
+  btnAddItem.Enabled := True;
+  btnFProduto.Enabled := True;
+  dbgrdItems.Enabled := True;
+  btnAddItem.Caption := 'Adicionar';
+  edtItemCod.SetFocus;
+end;
+
+procedure TfPDV.LimpaDadosPedido;
+begin
+  edtClienteCod.Clear;
+  edtClienteNome.Clear;
+  edtClienteCidade.Clear;
+  edtClienteUF.Clear;
+  edtItemCod.Enabled := False;
+  edtItemDescricao.Enabled := False;
+  edtItemQuantidade.Enabled := False;
+  edtItemPreco.Enabled := False;
+  btnAddItem.Enabled := False;
+  btnFProduto.Enabled := False;
+  lblTotalPedido.Caption := 'R$ 0,00';
+  Self.Caption := 'PDV  -  [ CAIXA LIVRE ]';
+  edtPedidoNumero.Clear;
+  edtPedidoNumero.ReadOnly := False;
+  qryListProduto.Close;
+end;
+
+procedure TfPDV.btnCancelarPedidoClick(Sender: TObject);
+begin
+  btnNovoPedido.Enabled := True;
+  btnGravarPedido.Enabled := False;
+  btnCancelarPedido.Enabled := False;
+  DM.conMySQL.Rollback;
+  MessageDlg('Pedido Cancelado!', mtConfirmation, [mbOk], 0);
+  LimpaDadosPedido;
+end;
+
+procedure TfPDV.btnCPedidoClick(Sender: TObject);
+var
+  ControllerPedido: TControllerPedidos;
+begin
+  If MessageDlg('Você tem certeza que deseja excluir o pedido: '+edtPedidoNumero.Text, mtWarning,
+    [mbyes, mbno], 0) = mryes then
+  begin
+
+    ControllerPedido := TControllerPedidos.Create;
+    try
+      try
+        ControllerPedido.Excluir(StrToInt(edtPedidoNumero.Text));
+      except
+        edtPedidoNumero.SetFocus;
+        raise Exception.Create('Cód. do pedido é inválido.');
+      end;
+    finally
+      FreeAndNil(ControllerPedido);
+    end;
+  end;
+
+end;
+
+procedure TfPDV.btnEditarPedidoClick(Sender: TObject);
+begin
+  btnGravarPedido.Enabled := False;
+  btnNovoPedido.Enabled := True;
+end;
+
+procedure TfPDV.btnFClienteClick(Sender: TObject);
+begin
+  try
+    LocalizaCliente(StrToInt(edtClienteCod.Text));
+  except
+    raise Exception.Create('Cód. do cliente é inválido.');
+  end;
+  if btnNovoPedido.Enabled then btnNovoPedido.Click;
+end;
+
+procedure TfPDV.btnFPedidoClick(Sender: TObject);
+var
+  ControllerPedido: TControllerPedidos;
+  Pedido: TPedido;
+  Cliente: TCliente;
+begin
+  ControllerPedido := TControllerPedidos.Create;
+  Pedido := TPedido.Create;
+  Cliente := TCliente.Create;
+  try
+    DM.conMySQL.StartTransaction;
+    try
+      ControllerPedido.CarregarPedido(StrToInt(edtPedidoNumero.Text), Pedido);
+    except
+      edtPedidoNumero.SetFocus;
+      raise Exception.Create('Cód. do pedido é inválido.');
+    end;
+    LocalizaCliente(Pedido.codigoCliente);
+    lblTotalPedido.Caption := FormatFloat('R$ #,##0.00', Pedido.ValorTotal);
+    qryListProduto.Close;
+    qryListProduto.ParamByName('NUMEROPEDIDO').AsInteger := Pedido.Numero;
+    qryListProduto.Open();
+    numeroDoPedido := Pedido.Numero;
+    btnGravarPedido.Enabled := True;
+    btnNovoPedido.Enabled := False;
+  finally
+    FreeAndNil(ControllerPedido);
+    FreeAndNil(Pedido);
+    FreeAndNil(Cliente);
+  end;
+
+end;
+
+procedure TfPDV.btnFProdutoClick(Sender: TObject);
+begin
+  LocalizaProduto;
+end;
+
+procedure TfPDV.btnGravarPedidoClick(Sender: TObject);
+begin
+  btnNovoPedido.Enabled := True;
+  btnGravarPedido.Enabled := False;
+  btnCancelarPedido.Enabled := False;
+  DM.conMySQL.Commit;
+  MessageDlg('Pedido finalizado com sucesso!', mtConfirmation, [mbOk], 0);
+  LimpaDadosPedido;
+end;
+
+procedure TfPDV.btnNovoPedidoClick(Sender: TObject);
+var
+  Pedido: TPedido;
+  Controller: TControllerPedidos;
+begin
+  numeroDoPedido := 0;
+  Pedido := TPedido.Create;
+  Controller := TControllerPedidos.Create;
+
+  try
+    try
+      with Pedido do
+      begin
+        DataEmissao := now;
+        codigoCliente := 1;
+        ValorTotal := 0;
+      end;
+
+      Controller.NovoPedido(Pedido);
+      btnNovoPedido.Enabled := False;
+      btnGravarPedido.Enabled := True;
+      btnCancelarPedido.Enabled := True;
+      numeroDoPedido := Pedido.Numero;
+      Self.Caption := 'PDV - Pedido Numero: ' + IntToStr(numeroDoPedido);
+      edtPedidoNumero.Text := IntToStr(numeroDoPedido);
+      edtPedidoNumero.ReadOnly := True;
+      qryListProduto.Close;
+      qryListProduto.ParamByName('NUMEROPEDIDO').AsInteger := numeroDoPedido;
+      qryListProduto.Open();
+      edtClienteCod.SetFocus;
+    except
+      on E: Exception do
+      begin
+        raise Exception.Create(E.Message);
+      end;
+    end;
+  finally
+    FreeAndNil(Pedido);
+    FreeAndNil(Controller);
+  end;
+
+end;
+
+procedure TfPDV.dbgrdItemsKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+var
+  Item: Titem;
+  Controller: TControllerItens;
+  TotalPedido: Double;
+begin
+  Controller := TControllerItens.Create;
+  Item := Titem.Create;
+  try
+    if Key = VK_DELETE then
+    begin
+      If MessageDlg('Você tem certeza que deseja excluir o registro?',
+        mtWarning, [mbyes, mbno], 0) = mryes then
+      begin
+        Item.Numero := qryListProdutoNUMEROITEM.AsInteger;
+        Item.NumeroPedido := qryListProdutoNUMEROPEDIDO.AsInteger;
+        TotalPedido := Controller.Excluir(Item);
+        lblTotalPedido.Caption := FormatFloat('R$ #,##0.00', TotalPedido);
+        MessageDlg('Produto excluido com sucesso!', mtConfirmation, [mbOk], 0);
+        qryListProduto.Refresh;
+      end;
+    end;
+  finally
+    FreeAndNil(Controller);
+    FreeAndNil(Item);
+  end;
+
+end;
+
+procedure TfPDV.dbgrdItemsKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    SetEditar;
+  end;
+
+end;
+
+procedure TfPDV.edtClienteCodChange(Sender: TObject);
+begin
+  if Trim(edtClienteCod.Text) = '' then
+  begin
+    btnFPedido.Visible := True;
+    btnCPedido.Visible := True;
+  end
+  else
+  begin
+    btnFPedido.Visible := False;
+    btnCPedido.Visible := False;
+  end;
+end;
+
+procedure TfPDV.edtClienteCodKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+  begin
+    if Trim(edtClienteCod.Text) = '' then
+    begin
+      edtClienteCod.Color := $B9B9FF;
+      MessageDlg('Selecione um Cliente...', mtInformation, [mbOk], 0);
+      edtClienteCod.SetFocus;
+      Abort;
+    end;
+    try
+      LocalizaCliente(StrToInt(edtClienteCod.Text));
+    except
+      raise Exception.Create('Cód. do cliente é inválido.');
+    end;
+    if btnNovoPedido.Enabled then btnNovoPedido.Click;
+  end;
+end;
+
+procedure TfPDV.edtItemCodKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+    LocalizaProduto;
+end;
+
+procedure TfPDV.edtItemPrecoKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+    btnAddItem.Click;
+  if not(Key in ['0' .. '9', ',', #8]) then
+    Key := #0;
+end;
+
+procedure TfPDV.ShowProduto(Produto: TProduto);
+begin
+  if Produto.Codigo = 0 then
+  begin
+    MessageDlg('Produto não localizado!', mtInformation, [mbOk], 0);
+    edtItemCod.Clear;
+    edtItemCod.SetFocus;
+  end
+  else
+  begin
+    edtItemDescricao.Text := Produto.Descricao;
+    edtItemQuantidade.Text := '1';
+    edtItemPreco.Text := CurrToStr(Produto.PrecoVenda);
+    edtItemCod.Color := clWindow;
+    edtItemQuantidade.SetFocus;
+  end;
+end;
+
+procedure TfPDV.edtItemQuantidadeKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key = #13 then
+    edtItemPreco.SetFocus;
+  if not(Key in ['0' .. '9', ',', #8]) then
+  begin
+    Key := #0;
+  end;
+
+end;
+
+procedure TfPDV.FormShow(Sender: TObject);
+begin
+  edtClienteCod.SetFocus;
+end;
+
+end.

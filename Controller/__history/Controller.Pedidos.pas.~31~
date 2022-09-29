@@ -1,0 +1,244 @@
+unit Controller.Pedidos;
+
+interface
+
+uses Model.Pedido, uDM, SysUtils, Data.DB, FireDAC.Comp.Client;
+
+type
+  TControllerPedidos = class
+  private
+
+  public
+    function NovoPedido(Pedido: TPedido): Integer;
+    procedure AlteraCliente(CodCliente, NumeroPedido: Integer);
+    procedure AtualizarTotal(Numero: Integer);
+    procedure Excluir(Numero: Integer);
+    procedure CarregarPedido(Numero: Integer; Pedido: TPedido);
+  end;
+
+implementation
+
+{ TControladorPedido }
+
+procedure TControllerPedidos.AlteraCliente(CodCliente, NumeroPedido: Integer);
+var
+  Erro: string;
+  QRY: TFDQuery;
+begin
+  QRY := TFDQuery.Create(nil);
+  try
+    with QRY do
+    begin
+      Connection := DM.conMySQL;
+      Close;
+      SQL.Clear;
+      SQL.Add('UPDATE PEDIDOS SET            ');
+      SQL.Add('    CODIGOCLIENTE = :CLIENTE  ');
+      SQL.Add('WHERE                         ');
+      SQL.Add('    (NUMERO = :NUMERO);       ');
+      ParamByName('NUMERO').AsInteger := NumeroPedido;
+      ParamByName('CLIENTE').AsInteger := CodCliente;
+    end;
+    try
+      QRY.ExecSQL;
+    except
+      on E: Exception do
+      begin
+        DM.conMySQL.Rollback;
+        Erro := 'Erro ao alterar cliente no pedido numero: ' +
+          IntToStr(NumeroPedido);
+        Erro := Erro + sLineBreak + E.Message;
+        raise Exception.Create(Erro);
+      end;
+    end;
+  finally
+    FreeAndNil(QRY);
+  end;
+end;
+
+procedure TControllerPedidos.AtualizarTotal(Numero: Integer);
+var
+  Erro: string;
+  QRY: TFDQuery;
+begin
+  QRY := TFDQuery.Create(nil);
+  try
+    with QRY do
+    begin
+      Connection := DM.conMySQL;
+      Close;
+      SQL.Clear;
+      SQL.Add('UPDATE PEDIDOS SET                   ');
+      SQL.Add('   VALORTOTAL =                      ');
+      SQL.Add('   (SELECT                           ');
+      SQL.Add('     SUM(QUANTIDADE * VALORUNITARIO) ');
+      SQL.Add('     FROM ITENS                      ');
+      SQL.Add('WHERE (NUMEROPEDIDO = :NUMERO)       ');
+      SQL.Add(')                                    ');
+      SQL.Add('WHERE                                ');
+      SQL.Add('   (NUMERO = :NUMERO);               ');
+      ParamByName('NUMERO').AsInteger := Numero;
+    end;
+    try
+      QRY.ExecSQL;
+    except
+      on E: Exception do
+      begin
+        DM.conMySQL.Rollback;
+        Erro := 'Erro no calculo do valor total [';
+        Erro := Erro + IntToStr(Numero) + ']';
+        Erro := Erro + sLineBreak + E.Message;
+        raise Exception.Create(Erro);
+      end;
+    end;
+  finally
+    FreeAndNil(QRY);
+  end;
+end;
+
+procedure TControllerPedidos.CarregarPedido(Numero: Integer; Pedido: TPedido);
+var
+  Erro: string;
+  QRY: TFDQuery;
+begin
+  QRY := TFDQuery.Create(nil);
+  try
+    with QRY do
+    begin
+      Connection := DM.conMySQL;
+      Close;
+      SQL.Clear;
+      SQL.Add('SELECT               ');
+      SQL.Add(' NUMERO,             ');
+      SQL.Add(' DATAEMISSAO,               ');
+      SQL.Add(' CODIGOCLIENTE,             ');
+      SQL.Add(' VALORTOTAL                  ');
+      SQL.Add('FROM                 ');
+      SQL.Add(' PEDIDOS            ');
+      SQL.Add('WHERE                ');
+      SQL.Add(' (NUMERO = :NUMERO); ');
+      ParamByName('NUMERO').AsInteger := Numero;
+    end;
+    try
+      QRY.Open;
+      Pedido.Numero := QRY.FieldByName('NUMERO').AsInteger;;
+      Pedido.DataEmissao := QRY.FieldByName('DATAEMISSAO').AsDateTime;
+      Pedido.CodigoCliente := QRY.FieldByName('CODIGOCLIENTE').AsInteger;
+      Pedido.ValorTotal := QRY.FieldByName('VALORTOTAL').AsCurrency;
+    except
+      on E: Exception do
+      begin
+        Erro := 'Falha ao Carregar Pedido ' + IntToStr(Numero);
+        Erro := Erro + sLineBreak + E.Message;
+        raise Exception.Create(Erro);
+      end;
+    end;
+  finally
+    FreeAndNil(QRY);
+  end;
+end;
+
+function TControllerPedidos.NovoPedido(Pedido: TPedido): Integer;
+var
+  Erro: string;
+  QRY: TFDQuery;
+begin
+  DM.conMySQL.StartTransaction;
+  QRY := TFDQuery.Create(nil);
+  try
+    with QRY do
+    begin
+      Connection := DM.conMySQL;
+      Close;
+      SQL.Clear;
+      SQL.Add(' INSERT INTO PEDIDOS (      ');
+      SQL.Add('     DATAEMISSAO,           ');
+      SQL.Add('     CODIGOCLIENTE,         ');
+      SQL.Add('     VALORTOTAL             ');
+      SQL.Add('      ) VALUES (            ');
+      SQL.Add('       :DATAEMISSAO,        ');
+      SQL.Add('       :CODIGOCLIENTE,      ');
+      SQL.Add('       :VALORTOTAL          ');
+      SQL.Add(');                          ');
+      ParamByName('DATAEMISSAO').AsDateTime := Pedido.DataEmissao;
+      ParamByName('CODIGOCLIENTE').AsInteger := Pedido.CodigoCliente;
+      ParamByName('VALORTOTAL').AsCurrency := Pedido.ValorTotal;
+    end;
+    try
+      QRY.ExecSQL;
+      with QRY do
+      begin
+        SQL.Clear;
+        SQL.Add('SELECT MAX(NUMERO) AS CODIGO FROM PEDIDOS;');
+        Open;
+        Pedido.Numero := FieldByName('CODIGO').AsInteger;
+      end;
+    except
+      on E: Exception do
+      begin
+        Pedido.Numero := -1;
+        DM.conMySQL.Rollback;
+        Erro := 'Falha ao Inserir o Pedido';
+        Erro := Erro + sLineBreak + E.Message;
+        raise Exception.Create(Erro);
+      end;
+    end;
+  finally
+    FreeAndNil(QRY);
+  end;
+end;
+
+procedure TControllerPedidos.Excluir(Numero: Integer);
+var
+  Erro: string;
+  QRY: TFDQuery;
+begin
+  QRY := TFDQuery.Create(nil);
+  try
+    with QRY do
+    begin
+      Connection := DM.conMySQL;
+      Close;
+      SQL.Clear;
+      SQL.Add('DELETE FROM PEDIDOS         ');
+      SQL.Add('WHERE                       ');
+      SQL.Add(' (NUMERO = :NUMERO);        ');
+      ParamByName('NUMERO').AsInteger := Numero;
+    end;
+    try
+      QRY.ExecSQL;
+    except
+      on E: Exception do
+      begin
+        DM.conMySQL.Rollback;
+        Erro := 'Falha ao Excluir Pedido ' + IntToStr(Numero);
+        Erro := Erro + sLineBreak + E.Message;
+      end;
+    end;
+
+    with QRY do
+    begin
+      Connection := DM.conMySQL;
+      Close;
+      SQL.Clear;
+      SQL.Add('DELETE FROM ITENS                ');
+      SQL.Add('WHERE                            ');
+      SQL.Add(' (NUMEROPEDIDO = :NUMEROPEDIDO); ');
+      ParamByName('NUMEROPEDIDO').AsInteger := Numero;
+    end;
+    try
+      QRY.ExecSQL;
+    except
+      on E: Exception do
+      begin
+        DM.conMySQL.Rollback;
+        Erro := 'Falha ao itens do pedido: ' + IntToStr(Numero);
+        Erro := Erro + sLineBreak + E.Message;
+      end;
+    end;
+  finally
+    FreeAndNil(QRY);
+  end;
+end;
+
+end.
